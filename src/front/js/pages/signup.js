@@ -9,33 +9,25 @@ const Signup = () => {
     return (
         <>
             <div className="container">
-                <h2 className="signup">Sign Up</h2>
+                <h1 className="signup" >Sign Up</h1>
                 <form id="signup-form">
-                    <div className="form-group">
-                        <label htmlFor="username">Username:</label>
-                        <input type="text" id="username" name="username" />
-                    </div>
+                    <label htmlFor="username">Username:</label>
+                    <input type="text" id="username" name="username" />
 
-                    <div className="form-group">
-                        <label htmlFor="email">Email:</label>
-                        <input type="email" id="email" name="email"  />
-                    </div>
+                    <label htmlFor="email">Email:</label>
+                    <input type="email" id="email" name="email" />
 
-                    <div className="form-group">
-                        <label htmlFor="password">Password:</label>
-                        <input type="password" id="password" name="password"  />
-                    </div>
+                    <label htmlFor="password">Password:</label>
+                    <input type="password" id="password" name="password" />
 
-                    <div className="form-group">
-                        <label htmlFor="confirm-password">Confirm Password:</label>
-                        <input
-                            type="password"
-                            id="confirm-password"
-                            name="confirm-password"
-                        />
-                    </div>
+                    <label htmlFor="confirm-password">Confirm Password:</label>
+                    <input
+                        type="password"
+                        id="confirm-password"
+                        name="confirm-password"
+                    />
 
-                    <button type="submit">Sign Up</button>
+                    <button className="btn btn-primary mt-3" type="submit">Sign Up</button>
                 </form>
             </div>
         </>

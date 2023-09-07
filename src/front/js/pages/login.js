@@ -24,43 +24,38 @@ const LogIn = () => {
         )
     }
     fetch("https://obscure-yodel-j669v9gjv46hp57x-3001.app.github.dev/api/token", options)
-    .then(response => {
-        if (response.ok){
-            console.log("the response is successful")
-            return response.json()
-        }
+        .then(response => {
+            if(response.status == 200) return response.json();
+        })
 
-    })
-    .then(data => console.log("Access token", data))
-    .catch(error => console.log("error", error))
-    
-  }
+        .then(data => console.log("Access token: ", data))
+        .catch(error => console.log("There was an error", error))
+    }   
 
   return (
     <div className="container"> 
-      <h2 className="login">Log In</h2> 
+      <h1 className="login">Log In</h1> 
       <form id="login-form"> 
-        <div className="form-group"> 
           <label htmlFor="email">Email:</label> 
           <input 
                 type="text" 
                 id="email" 
                 name="email"
-                onChange={e => setEmail(e.target.value)} value={email}
-             required />
-        </div>
-
-        <div className="form-group">
+                placeholder="enter email"
+                onChange={e => setEmail(e.target.value)} 
+                value={email}
+          />
           <label htmlFor="password">Password:</label>
           <input 
                 type="password" 
                 id="password" 
                 name="password"
-                onChange={e => setPassword(e.target.value)} value={password} 
-                required />
-        </div>
-
-        <button type="submit" onClick={handleClick}>Log In</button> 
+                placeholder="enter password"
+                onChange={e => setPassword(e.target.value)} 
+                value={password} 
+          />
+        
+        <button className="btn btn-primary mt-3" type="submit" onClick={handleClick}>Log In</button> 
       </form>
     </div>
   );
