@@ -21,60 +21,68 @@ const getState = ({ getStore, getActions, setStore }) => {
 			exampleFunction: () => {
 				getActions().changeColor(0, "green");
 			},
-		
-		syncTokenFromSessionStore : () =>{
-			const token = sessionStorage.getItem("token");
-			console.log("Application just loaded, syncing the session storage token");
-			if (token && token != "" && token != undefined) setStore({token : token});
 
-		},
-		logout : () =>{
-			sessionStorage.removeItem("token");
-			console.log("login out");
-			setStore({token : null});
-		}, 
-		login: async(email, password) =>{
+			syncTokenFromSessionStore: () => {
+				const token = sessionStorage.getItem("token");
+				console.log("Application just loaded, syncing the session storage token");
+				if (token && token != "" && token != undefined) setStore({ token: token });
+
+			},
+			logout: () => {
+				sessionStorage.removeItem("token");
+				console.log("login out");
+				setStore({ token: null });
+			},
+			login: async (email, password) => {
 				const options = {
 					method: "POST",
 					headers: {
-					  "Content-Type": "application/json"
+						"Content-Type": "application/json"
 					},
 					body: JSON.stringify(
-					  {
-						"email": email,
-						"password": password
-					  }
+						{
+							"email": email,
+							"password": password
+						}
 					)
-				  };
-				  try{
+				};
+				try {
 					const response = await fetch("https://obscure-yodel-j669v9gjv46hp57x-3001.app.github.dev/api/token", options)
 					if (response.status !== 200) {
 						alert("there has been an error")
 						return false
 					}
-				 const data = await response.json();
-					console.log("this came from the backend" , data);
-					sessionStorage.setItem({"token": data.access_token});
-					setStore({token : data.access_token})
+					const data = await response.json();
+					console.log("this came from the backend", data);
+					sessionStorage.setItem("token", data.access_token);
+					setStore({ token: data.access_token })
 					return true;
 				}
-				  catch(error){
+				catch (error) {
 					console.log("There was an error")
-				} 
-				  
-			},
-		
-			getMessage: async () => {
-				try{
-					// fetching data from the backend
-					const resp = await fetch(process.env.BACKEND_URL + "/api/hello")
-					const data = await resp.json()
-					setStore({ message: data.message })
-					// don't forget to return something, that is how the async resolves
-					return data;
-				}catch(error){
-					console.log("Error loading message from backend", error)
 				}
+
+			},
+
+			getMessage: () => {
+				const store = getStore();
+				const options = {
+					headers: {
+						"Authorization": "Bearer " + store.token
+					}
+				};
+
+				fetch("https://obscure-yodel-j669v9gjv46hp57x-3001.app.github.dev/api/hello", options)
+					.then(response => {
+						if (!response.ok) {
+							throw new Error("Network response was not ok");
+						}
+						return response.json();
+					})
+					.then(data => setStore({ message: data.message }))
+					.catch(error => {
+						console.error("Error loading message from backend", error);
+					});
 			},
 
 			changeColor: (index, color) => {

@@ -18,11 +18,22 @@ CORS(api)
 def create_token():
     email = request.json.get("email", None)
     password = request.json.get("password", None)
-    if email != "test" or password != "test":
+    if email != "Aily" or password != "Aily":
         return jsonify({"msg": "Bad email or password"}), 401
 
     access_token = create_access_token(identity=email)
     return jsonify(access_token=access_token)
+
+@api.route("/hello", methods=["GET"])
+@jwt_required()
+def create_hello():
+   
+   email = get_jwt_identity()
+   dictionary = {
+      "message" : "hello world " + email
+   }
+   return jsonify(dictionary)
+
 
 
 

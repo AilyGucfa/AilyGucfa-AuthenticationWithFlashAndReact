@@ -1,20 +1,20 @@
 import React, { useContext, useState } from "react";
 import { Context } from "../store/appContext";
-import { useHistory } from "react-router";
+import { useNavigate } from "react-router-dom";
 
 
 const LogIn = () => {
   const { store, actions } = useContext(Context);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
- //const history = useHistory();
+  const navigate = useNavigate();
 
   const handleClick = (e) => {
     e.preventDefault();
     actions.login(email, password);
 
   };
- // if(store.token && store.token != "" && store.token != undefined) history.push("/");
+  if(store.token && store.token != "" && store.token != undefined) navigate("/");
 
   return (
     <div className="container">
