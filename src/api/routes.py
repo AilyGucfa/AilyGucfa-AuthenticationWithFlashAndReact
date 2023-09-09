@@ -30,19 +30,16 @@ def create_hello():
    
    email = get_jwt_identity()
    dictionary = {
-      "message" : "hello world " + email
+      "message" : "Hello " + email + "! "
    }
    return jsonify(dictionary)
 
-
-
-
-@api.route("/signup", methods=["POST"])
+@api.route("/api/signup", methods=["POST"])
 def signup():
     # Get user data from the request
     data = request.get_json()
-    email = data.get("email")
-    password = data.get("password")
+    email = data.get("email",None)
+    password = data.get("password", None)
 
     # Check if the email is already registered
     existing_user = User.query.filter_by(email=email).first()
@@ -54,8 +51,7 @@ def signup():
     db.session.add(new_user)
     db.session.commit()
 
-    return jsonify({"message": "User registered successfully"}), 201
-
+    return jsonify({"message": "User registered successfully"}), 200
 
 
 # Create a protected route (example)

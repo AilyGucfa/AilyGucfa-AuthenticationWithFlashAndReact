@@ -1,35 +1,72 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { Context } from "../store/appContext";
-
+import { useNavigate } from "react-router-dom";
 
 const Signup = () => {
-    const { store, actions } = useContext(Context);
+  const { store, actions } = useContext(Context);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const navigate = useNavigate();
 
-    return (
-        <>
-            <div className="container">
-                <h1 className="signup" >Sign Up</h1>
-                <form id="signup-form">
-                    <label htmlFor="username">Username:</label>
-                    <input type="text" id="username" name="username" />
+  const handleSignup = async (e) => {
+    e.preventDefault();
 
-                    <label htmlFor="email">Email:</label>
-                    <input type="email" id="email" name="email" />
+    // Check if password and confirmPassword match
+    if (password !== confirmPassword) {
+      alert("Passwords do not match.");
+      return;
+    }
 
-                    <label htmlFor="password">Password:</label>
-                    <input type="password" id="password" name="password" />
+    const signupSuccess = await actions.signup( email, password);
 
-                    <label htmlFor="confirm-password">Confirm Password:</label>
-                    <input
-                        type="password"
-                        id="confirm-password"
-                        name="confirm-password"
-                    />
+    if (signupSuccess) {
+      navigate("/login")
+    }
+  };
 
-                    <button className="btn btn-primary mt-3" type="submit">Sign Up</button>
-                </form>
-            </div>
-        </>
-    );
+  if(store.token && store.token != "" && store.token != undefined) navigate("/");
+
+  return (
+    <div className="container">
+      <h1 className="signup">Sign Up</h1>
+      {store.token && store.token != "" && store.token != undefined ? ('You are logged in with this token', store.token) : (
+      <form id="signup-form">
+        <label htmlFor="email">Email:</label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          onChange={(e) => setEmail(e.target.value)}
+          value={email}
+        />
+
+        <label htmlFor="password">Password:</label>
+        <input
+          type="password"
+          id="password"
+          name="password"
+          onChange={(e) => setPassword(e.target.value)}
+          value={password}
+        />
+
+        <label htmlFor="confirmPassword">Confirm Password:</label>
+        <input
+          type="password"
+          id="confirmPassword"
+          name="confirmPassword"
+          onChange={(e) => setConfirmPassword(e.target.value)}
+          value={confirmPassword}
+        />
+
+        <button className="btn btn-primary mt-3" type="submit" onClick={handleSignup}>
+          Sign Up
+        </button>
+      </form>
+      )}
+      
+    </div>
+  );
 };
+
 export default Signup;

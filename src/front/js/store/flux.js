@@ -63,7 +63,37 @@ const getState = ({ getStore, getActions, setStore }) => {
 				}
 
 			},
-
+			signup: async (email, password) => {
+				const options = {
+				  method: "POST",
+				  headers: {
+					"Content-Type": "application/json",
+				  },
+				  body: JSON.stringify(
+					{
+						"email": email,
+						"password": password
+				  }),
+				};
+			  
+				try {
+				  const response = await fetch("https://obscure-yodel-j669v9gjv46hp57x-3001.app.github.dev/api/signup", options);
+				  
+				  if (response.ok) {
+					alert("Signup successful");
+					return true;
+				  } else if (response.status === 400) {
+					alert("Email already in use. Please choose another email.");
+				  } else {
+					alert("Signup failed. Please try again later.");
+				  }
+				} catch (error) {
+				  console.error("Error during signup:", error);
+				}
+			  
+				return false;
+			  },
+			  
 			getMessage: () => {
 				const store = getStore();
 				const options = {

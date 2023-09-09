@@ -20,12 +20,8 @@ export const Home = () => {
 			<div className="alert alert-info">
 				{store.message}
 			</div>
-			<p>
-				This boilerplate comes with lots of documentation:{" "}
-				<a href="https://start.4geeksacademy.com/starters/react-flask">
-					Read documentation
-				</a>
-			</p>
 		</div>
+		
+		
 	);
 };
