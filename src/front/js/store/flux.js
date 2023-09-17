@@ -28,7 +28,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 				if (token && token != "" && token != undefined) setStore({ token: token });
 
 			},
-			logout: () => {
+			logout: async () => {
 				sessionStorage.removeItem("token");
 				console.log("login out");
 				setStore({ token: null });
@@ -55,7 +55,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 					const data = await response.json();
 					console.log("this came from the backend", data);
 					sessionStorage.setItem("token", data.access_token);
-					setStore({ token: data.access_token })
+					setStore({ token: data.access_token, email: email }); // Set the email in the store
 					return true;
 				}
 				catch (error) {
@@ -78,7 +78,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 			  
 				try {
 				  const response = await fetch("https://obscure-yodel-j669v9gjv46hp57x-3001.app.github.dev/api/signup", options);
-				  
+				// const response = await fetch(process.env.BACKEND_URL + "api/signup", options)
 				  if (response.ok) {
 					alert("Signup successful");
 					return true;

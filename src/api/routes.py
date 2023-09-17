@@ -1,61 +1,80 @@
-"""
-This module takes care of starting the API Server, Loading the DB and Adding the endpoints
-"""
 from flask import Flask, request, jsonify, url_for, Blueprint
 from api.models import db, User
 from api.utils import generate_sitemap, APIException
-from flask_jwt_extended import create_access_token
-from flask_jwt_extended import get_jwt_identity
-from flask_jwt_extended import jwt_required
-from flask_cors import CORS  # Import CORS
+from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
+from flask_cors import CORS
 
 api = Blueprint('api', __name__)
-
 CORS(api)
-# Create a route to authenticate your users and return JWTs. The
-# create_access_token() function is used to actually generate the JWT.
+
 @api.route("/token", methods=["POST"])
 def create_token():
     email = request.json.get("email", None)
-    password = request.json.get("password", None)
-    if email != "Aily" or password != "Aily":
-        return jsonify({"msg": "Bad email or password"}), 401
-
     access_token = create_access_token(identity=email)
     return jsonify(access_token=access_token)
 
 @api.route("/hello", methods=["GET"])
 @jwt_required()
-def create_hello():
-   
-   email = get_jwt_identity()
-   dictionary = {
-      "message" : "Hello " + email + "! "
-   }
-   return jsonify(dictionary)
+def get_hello():
+    email = get_jwt_identity()
+    dictionary = {
+        "message": "Hello " + email + "! "
+    }
+    return jsonify(dictionary)
 
-@api.route("/api/signup", methods=["POST"])
-def signup():
-    # Get user data from the request
-    data = request.get_json()
-    email = data.get("email",None)
-    password = data.get("password", None)
+@api.route('/user', methods=['GET'])
+def get_all_users():
+    users = User.query.all()
+    all_users = list(map(lambda x: x.serialize(), users))
+    return jsonify(all_users), 200
 
-    # Check if the email is already registered
-    existing_user = User.query.filter_by(email=email).first()
-    if existing_user:
-        return jsonify({"message": "Email already in use"}), 400
+@api.route('/user/<int:id>', methods=['GET'])
+def get_user(id):
+    user = User.query.get(id)
+    if user is None:
+        raise APIException('User not found', status_code=404)
+    return jsonify(user.serialize()), 200
 
-    # Create a new user
-    new_user = User(email=email, password=password)
-    db.session.add(new_user)
+@api.route('/signup', methods=['POST'])
+def create_user():
+    body = request.get_json()
+    user = User()
+    if "email" not in body:
+        raise APIException('You need to specify the email', status_code=400)
+    if "password" not in body:
+        raise APIException('You need to specify the password', status_code=400)
+    user.email = body["email"]
+    user.password = body["password"]
+    user.is_active = True
+    db.session.add(user)
     db.session.commit()
+    return jsonify(user.serialize()), 200
 
-    return jsonify({"message": "User registered successfully"}), 200
+@api.route('/user/<int:id>', methods=['PUT'])
+def update_user(id):
+    body = request.get_json()
+    user = User.query.get(id)
+    if user is None:
+        raise APIException('User not found', status_code=404)
+    if "email" in body:
+        user.email = body["email"]
+    if "password" in body:
+        user.password = body["password"]
+    if "is_active" in body:
+        user.is_active = body["is_active"]
+    db.session.commit()
+    return jsonify(user.serialize()), 200
 
+@api.route('/user/<int:id>', methods=['DELETE'])
+def delete_user(id):
+    user = User.query.get(id)
+    if user is None:
+        raise APIException('User not found', status_code=404)
+    db.session.delete(user)
+    db.session.commit()
+    return jsonify(user.serialize()), 200
 
-# Create a protected route (example)
-@api.route("/api/private_data", methods=["GET"])
+@api.route("/private", methods=["GET"])
 @jwt_required()
 def get_private_data():
     current_user = get_jwt_identity()

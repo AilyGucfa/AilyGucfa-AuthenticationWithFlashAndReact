@@ -1,7 +1,6 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { Context } from "../store/appContext";
 import { useNavigate } from "react-router-dom";
-
 
 const LogIn = () => {
   const { store, actions } = useContext(Context);
@@ -9,42 +8,72 @@ const LogIn = () => {
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
-  const handleClick = (e) => {
-    e.preventDefault();
-    actions.login(email, password);
+  useEffect(() => {
+    // Check if the user is already logged in, and redirect to the private page if so
+    if (store.token) {
+      navigate("/private");
+    }
+  }, [store.token, navigate]);
 
+  const handleClick = (e) => {
+    e.preventDefault(); // Prevent form submission
+    actions.login(email, password);
   };
-  if(store.token && store.token != "" && store.token != undefined) navigate("/");
 
   return (
     <div className="container">
-      <h1 className="login">Log In</h1>
-
-      {store.token && store.token != "" && store.token != undefined ? ('You are logged in with this token', store.token) : (
-        <form id="login-form">
-          <label htmlFor="email">Email:</label>
-          <input
-            type="text"
-            id="email"
-            name="email"
-            placeholder="enter email"
-            onChange={e => setEmail(e.target.value)}
-            value={email}
-          />
-          <label htmlFor="password">Password:</label>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            placeholder="enter password"
-            onChange={e => setPassword(e.target.value)}
-            value={password}
-          />
-
-          <button className="btn btn-primary mt-3" type="submit" onClick={handleClick}>Log In</button>
-        </form>
-      )}
-
+      <div className="row justify-content-center">
+        <div className="col-md-6">
+          <div className="card mt-5">
+            <div className="card-body">
+              <h1 className="card-title text-center">Log In</h1>
+              {!store.token ? (
+                <form id="login-form">
+                  <div className="mb-3">
+                    <label htmlFor="email" className="form-label">
+                      Email:
+                    </label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      id="email"
+                      name="email"
+                      placeholder="Enter email"
+                      onChange={(e) => setEmail(e.target.value)}
+                      value={email}
+                    />
+                  </div>
+                  <div className="mb-3">
+                    <label htmlFor="password" className="form-label">
+                      Password:
+                    </label>
+                    <input
+                      type="password"
+                      className="form-control"
+                      id="password"
+                      name="password"
+                      placeholder="Enter password"
+                      onChange={(e) => setPassword(e.target.value)}
+                      value={password}
+                    />
+                  </div>
+                  <button
+                    className="btn btn-primary btn-block"
+                    type="submit"
+                    onClick={handleClick}
+                  >
+                    Log In
+                  </button>
+                </form>
+              ) : (
+                <p className="text-center">
+                  You are already logged in. Redirecting to the private page...
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

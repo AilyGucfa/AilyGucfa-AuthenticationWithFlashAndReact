@@ -1,70 +1,87 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { Context } from "../store/appContext";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const Signup = () => {
   const { store, actions } = useContext(Context);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const handleSignup = async (e) => {
-    e.preventDefault();
+  function submitRequest(e) {
+    e.preventDefault(); // Prevent form submission
+    actions.signup(email, password).then((success) => {
+      if (success) {
+        // Redirect to the login page
+        navigate("/login");
+      }
+    });
+  }
 
-    // Check if password and confirmPassword match
-    if (password !== confirmPassword) {
-      alert("Passwords do not match.");
-      return;
+  useEffect(() => {
+    if (store.message !== null && store.message !== "") {
+      setError(store.message);
     }
-
-    const signupSuccess = await actions.signup( email, password);
-
-    if (signupSuccess) {
-      navigate("/login")
-    }
-  };
-
-  if(store.token && store.token != "" && store.token != undefined) navigate("/");
+  }, [store.message]);
 
   return (
     <div className="container">
-      <h1 className="signup">Sign Up</h1>
-      {store.token && store.token != "" && store.token != undefined ? ('You are logged in with this token', store.token) : (
-      <form id="signup-form">
-        <label htmlFor="email">Email:</label>
-        <input
-          type="email"
-          id="email"
-          name="email"
-          onChange={(e) => setEmail(e.target.value)}
-          value={email}
-        />
+      <div className="row justify-content-center">
+        <div className="col-md-6">
+          <div className="card mt-5">
+            <div className="card-body">
+              <h1 className="card-title text-center">Sign Up</h1>
+              {store.token ? (
+                <p className="card-text text-center">
+                  You are logged in with this token: {store.token}
+                </p>
+              ) : (
+                <form id="signup-form">
+                  <div className="mb-3">
+                    <label htmlFor="email" className="form-label">
+                      Email:
+                    </label>
+                    <input
+                      type="email"
+                      className="form-control"
+                      id="email"
+                      name="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                    />
+                  </div>
 
-        <label htmlFor="password">Password:</label>
-        <input
-          type="password"
-          id="password"
-          name="password"
-          onChange={(e) => setPassword(e.target.value)}
-          value={password}
-        />
+                  <div className="mb-3">
+                    <label htmlFor="password" className="form-label">
+                      Password:
+                    </label>
+                    <input
+                      type="password"
+                      className="form-control"
+                      id="password"
+                      name="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                    />
+                  </div>
 
-        <label htmlFor="confirmPassword">Confirm Password:</label>
-        <input
-          type="password"
-          id="confirmPassword"
-          name="confirmPassword"
-          onChange={(e) => setConfirmPassword(e.target.value)}
-          value={confirmPassword}
-        />
-
-        <button className="btn btn-primary mt-3" type="submit" onClick={handleSignup}>
-          Sign Up
-        </button>
-      </form>
-      )}
-      
+                  <button
+                    className="btn btn-primary btn-block"
+                    onClick={submitRequest}
+                  >
+                    Submit
+                  </button>
+                </form>
+              )}
+              <div className="mt-3 text-center">
+                {error !== "" && <p className="text-danger">{error}</p>}
+                {error !== "" && <Link to="/login">Login</Link>}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
